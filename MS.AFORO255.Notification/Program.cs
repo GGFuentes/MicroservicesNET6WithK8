@@ -1,6 +1,11 @@
+using Aforo255.Cross.Event.Src.Bus;
+using Aforo255.Cross.Event.Src;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MS.AFORO255.Notification.Data;
+using MS.AFORO255.Notification.Messages.EventHandlers;
 using MS.AFORO255.Notification.Persistences;
+using MS.AFORO255.Notification.Messages.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ContextDatabase>(
@@ -9,11 +14,25 @@ builder.Services.AddDbContext<ContextDatabase>(
         opt.UseMySQL(builder.Configuration["mariadb:cn"]);
     });
 // Add services to the container.
+/*Start - RabbitMQ*/
+builder.Services.AddMediatR(typeof(Program));
+builder.Services.AddRabbitMQ();
+
+builder.Services.AddTransient<NotificationEventHandler>();
+builder.Services.AddTransient<IEventHandler<NotificationCreatedEvent>, NotificationEventHandler>();
+/*End - RabbitMQ*/
 
 var app = builder.Build();
-
+ConfigureEventBus(app);
 // Configure the HTTP request pipeline.
 
 DbCreated.CreateDbIfNotExists(app);
 app.Run();
+
+
+void ConfigureEventBus(IApplicationBuilder app)
+{
+    var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+    eventBus.Subscribe<NotificationCreatedEvent, NotificationEventHandler>();
+}
 
