@@ -12,12 +12,14 @@ namespace MS.AFORO255.Deposit.Controllers
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionService _transactionService;
-        public readonly IEventBus _eventeBus;
+        public readonly IEventBus _eventBus;
+        private readonly IAccountService _accountService;
 
-        public TransactionController(ITransactionService transactionService,IEventBus eventBus)
+        public TransactionController(ITransactionService transactionService,IEventBus eventBus, IAccountService accountService)
         {
             _transactionService = transactionService;
-            _eventeBus = eventBus;
+            _eventBus = eventBus;
+            _accountService = accountService;
         }
            
 
@@ -26,10 +28,15 @@ namespace MS.AFORO255.Deposit.Controllers
         {
             TransactionModel transaction = new TransactionModel(request.Amount, request.AccountId);
             transaction = _transactionService.Deposit(transaction);
-
-            _eventeBus.SendCommand(new TransactionCreateCommand(transaction.Id, transaction.Amount, transaction.Type, transaction.CreationDate
+            if (_accountService.Execute(transaction))
+            {
+                _eventBus.SendCommand(new TransactionCreateCommand(transaction.Id, transaction.Amount, transaction.Type, transaction.CreationDate
                 , transaction.AccountId));
 
+                _eventBus.SendCommand(new NotificationCreateCommand(transaction.Id, transaction.Amount, transaction.Type,
+                          $"Se proceso el {transaction.Type} con el monto de {transaction.Amount} de su cuenta {transaction.AccountId}",
+                          "servicedesk@aforo255.com", transaction.AccountId));
+            }
             return Ok(transaction);
         }
     }

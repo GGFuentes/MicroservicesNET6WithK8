@@ -1,4 +1,6 @@
+using Aforo255.Cross.Discovery.Consul;
 using Aforo255.Cross.Event.Src;
+using Aforo255.Cross.Http.Src;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MS.AFORO255.Deposit.Data;
@@ -39,15 +41,20 @@ void ConfigureServices(IServiceCollection services)
             options.UseNpgsql(builder.Configuration["postgres:cn"]);
         });
     services.AddScoped<ITransactionService, TransactionService>();
+    services.AddScoped<IAccountService, AccountService>();
     /*Start RabbitMQ*/
     services.AddMediatR(typeof(Program).GetTypeInfo().Assembly);
     services.AddRabbitMQ();
     services.AddTransient<IRequestHandler<TransactionCreateCommand, bool>, TransactionCommandHandler>();
+    services.AddTransient<IRequestHandler<NotificationCreateCommand, bool>, NotificationCommandHandler>();
     /*End RabbitMQ*/
+    services.AddProxyHttp();
+    services.AddConsul();
 }
 void ConfigureMiddleware(IApplicationBuilder app, IServiceProvider services)
 {
     app.UseAuthorization();
+    app.UseConsul();
 }
 void ConfigureEndpoints(IEndpointRouteBuilder app, IServiceProvider services)
 {

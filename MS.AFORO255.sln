@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{D1E6D8B5-549F-487D-929F-4815F16244F7}"
+	ProjectSection(SolutionItems) = preProject
+		kong.yml = kong.yml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{50350E19-4DFE-4D66-8D19-73A835EC9D65}"
 EndProject
@@ -14,6 +17,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{1769EE2C-4944-4CF8-B58E-483F0125FC50}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose-databases.yml = docker-compose-databases.yml
+		docker-compose-gateway.yml = docker-compose-gateway.yml
+		docker-compose-services.yml = docker-compose-services.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01-Security", "01-Security", "{170E9471-F5F8-4368-8BFC-87AA31B98F38}"

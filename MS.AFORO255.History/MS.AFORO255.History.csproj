@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aforo255.Cross.Discovery" Version="6.0.0" />
     <PackageReference Include="Aforo255.Cross.Event" Version="6.0.0" />
     <PackageReference Include="Carter" Version="6.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.14.1" />

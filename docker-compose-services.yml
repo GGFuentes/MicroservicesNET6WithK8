@@ -1,0 +1,49 @@
+version: "3.5"
+
+services:
+  service-rabbitmq:
+    image: rabbitmq:3.8.13-management
+    container_name: component-event
+    environment:
+      - RABBITMQ_DEFAULT_USER=aforo255
+      - RABBITMQ_DEFAULT_PASS=aforo255
+    ports:
+    - 5672:5672
+    - 15672:15672
+    networks:
+    - aforo255  
+  service-discovery:
+    image: consul:1.9.10
+    container_name: component-discovery
+    restart: always
+    ports:
+    - 8500:8500
+    networks:
+    - aforo255
+  service-balancer:
+    image: fabiolb/fabio:1.5.15-go1.15.5
+    container_name: component-balancer
+    restart: always
+    environment:
+    - FABIO_REGISTRY_CONSUL_ADDR=component-discovery:8500
+    ports:
+    - 9998:9998
+    - 9999:9999
+    networks:
+    - aforo255
+    depends_on:
+    - service-discovery
+  service-config:
+    image: nacos/nacos-server:v2.0.3
+    container_name: component-config 
+    restart: always
+    environment:
+    - MODE=standalone
+    ports:
+    - 8848:8848
+    networks:
+    - aforo255
+
+networks:
+  aforo255:
+    name: micro

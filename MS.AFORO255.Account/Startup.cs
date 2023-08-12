@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Aforo255.Cross.Discovery.Consul;
+using Aforo255.Cross.Discovery.Fabio;
+using Microsoft.EntityFrameworkCore;
 using MS.AFORO255.Account.Persistences;
 using MS.AFORO255.Account.Service;
 
@@ -20,11 +22,14 @@ public class Startup
           });
 
         services.AddScoped<IAccountService, AccountService>();
+        services.AddConsul();
+        services.AddFabio();
     }
 
     public void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime)
     {
         app.UseAuthorization();
+        app.UseConsul();
     }
 
     public void ConfigureEndpoints(IEndpointRouteBuilder app, IHostApplicationLifetime lifetime)

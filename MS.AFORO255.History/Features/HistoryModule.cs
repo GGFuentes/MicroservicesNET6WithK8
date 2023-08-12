@@ -11,6 +11,8 @@ public class HistoryModule : ICarterModule
         app.MapGet("api/history/{accountId}", GetAccount)
            .Produces<HistoryResponse>()
            .Produces(StatusCodes.Status404NotFound);
+
+        app.MapGet("ping", Ping);
     }
 
     private static async Task<IResult> GetAccount(int accountId, IHistoryService service)
@@ -18,6 +20,10 @@ public class HistoryModule : ICarterModule
         var movements = await service.GetById(accountId);
         if (movements is null)  return Results.NotFound();
         return Results.Ok(movements);
+    }
+    private static IResult Ping()
+    {
+        return Results.Ok();
     }
 }
 

@@ -1,0 +1,66 @@
+_format_version: '2.1'
+
+services:
+  - name: security-service
+    url: http://host.docker.internal:5001/api/auth
+    plugins:
+      - name: jwt
+        config:
+         anonymous: 9ddccc14-6866-584f-a82b-51e47864af89
+    routes:
+      - name: security-route
+        paths:
+          - /api/token
+  - name: account-service
+    url: http://host.docker.internal:9999/app-account/api/account
+    routes:
+      - name: account-route
+        paths:
+          - /api/account
+  - name: deposit-service
+    url: http://host.docker.internal:5003/api/transaction/deposit
+    routes:
+      - name: deposit-route
+        paths:
+          - /api/transaction/deposit
+  - name: withdrawal-service
+    url: http://host.docker.internal:5004/api/transaction/withdrawal
+    routes:
+      - name: withdrawal-route
+        paths:
+          - /api/transaction/withdrawal
+  - name: history-service
+    url: http://host.docker.internal:5005/api/history
+    routes:
+      - name: history-route
+        paths:
+          - /api/history
+
+plugins:
+- name: cors
+  config: 
+    origins:
+    - "*"
+    methods:
+    - GET
+    - POST
+    headers:
+    - "*"
+    exposed_headers:
+    - "*"
+    credentials: true
+    max_age: 3600
+    preflight_continue: false
+- name: jwt
+  config: 
+    secret_is_base64: false
+    run_on_preflight: true
+consumers:
+  - username: login_aforo255_issuer
+    custom_id: aforo255_id
+  - username: anonymous_users
+    id: 9ddccc14-6866-584f-a82b-51e47864af89
+jwt_secrets:
+  - consumer: login_aforo255_issuer
+    secret: "CLave#12548MIentrasMas45566Mejor____%%%dddd"
+  - consumer: anonymous_users
