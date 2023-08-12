@@ -8,10 +8,19 @@ using MS.AFORO255.Notification.Persistences;
 using MS.AFORO255.Notification.Messages.Events;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureAppConfiguration((host, builder) =>
+{
+    var c = builder.Build();
+    builder.AddNacosConfiguration(c.GetSection("nacosConfig"));
+});
+
+var config = builder.Configuration;
+
 builder.Services.AddDbContext<ContextDatabase>(
     opt =>
     {
-        opt.UseMySQL(builder.Configuration["mariadb:cn"]);
+        opt.UseMySQL(builder.Configuration["cn:mariadb"]);
     });
 // Add services to the container.
 /*Start - RabbitMQ*/

@@ -3,6 +3,13 @@ using MS.AFORO255.Account.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureAppConfiguration((host, builder) =>
+{
+    var c = builder.Build();
+    builder.AddNacosConfiguration(c.GetSection("nacosConfig"));
+});
+
+var config = builder.Configuration;
 // Configure the HTTP request pipeline.
 // Manually create an instance of the Startup class
 var startup = new Startup(builder.Configuration);

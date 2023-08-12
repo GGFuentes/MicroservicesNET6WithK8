@@ -10,11 +10,18 @@ using MS.AFORO255.History.Messages.Events;
 using Aforo255.Cross.Discovery.Consul;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureAppConfiguration((host, builder) =>
+{
+    var c = builder.Build();
+    builder.AddNacosConfiguration(c.GetSection("nacosConfig"));
+});
+var config = builder.Configuration;
 // Add services to the container.
 builder.Services.AddCarter();
 builder.Services.Configure<Mongosettings>(opt =>
 {
-    opt.Connection = builder.Configuration.GetSection("mongo:cn").Value;
+    opt.Connection = builder.Configuration.GetSection("cn:mongo").Value;
     opt.DatabaseName = builder.Configuration.GetSection("mongo:database").Value;
 });
 builder.Services.AddScoped<IHistoryService, HistoryService>();

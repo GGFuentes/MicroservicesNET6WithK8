@@ -12,6 +12,12 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureAppConfiguration((host, builder) =>
+{
+    var c = builder.Build();
+    builder.AddNacosConfiguration(c.GetSection("nacosConfig"));
+});
+var config = builder.Configuration;
 // Add services to the container.
 ConfigureConfiguration(builder.Configuration);
 ConfigureServices(builder.Services);
@@ -38,7 +44,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddDbContext<ContextDatabase>(
         options =>
         {
-            options.UseNpgsql(builder.Configuration["postgres:cn"]);
+            options.UseNpgsql(builder.Configuration["cn:postgres"]);
         });
     services.AddScoped<ITransactionService, TransactionService>();
     services.AddScoped<IAccountService, AccountService>();

@@ -1,6 +1,8 @@
 ﻿using Aforo255.Cross.Http.Src;
 using MS.AFORO255.Withdrawal.DTOs;
 using MS.AFORO255.Withdrawal.Models;
+using Polly;
+using Polly.CircuitBreaker;
 
 namespace MS.AFORO255.Withdrawal.Services;
 
@@ -31,9 +33,31 @@ public class AccountService : IAccountService
     }
     public bool Execute(TransactionModel request)
     {
-        bool response = false;       
+        bool response = false;
 
-        response = WithdrawalAccount(new AccountRequest(request.AccountId, request.Amount)).Result;
+        var circuitBreakerPolicy = Policy.Handle<Exception>().
+          CircuitBreaker(3, TimeSpan.FromSeconds(10));
+
+        var retry = Policy.Handle<Exception>()
+                .WaitAndRetryForever(attemp => TimeSpan.FromSeconds(10))
+                .Wrap(circuitBreakerPolicy);
+
+        retry.Execute(() =>
+        {
+            if (circuitBreakerPolicy.CircuitState == CircuitState.Closed)
+            {
+                circuitBreakerPolicy.Execute(() =>
+                {
+                    response = WithdrawalAccount(new AccountRequest(request.AccountId, request.Amount)).Result;
+                });
+            }
+
+            if (circuitBreakerPolicy.CircuitState != CircuitState.Closed)
+            {
+                WithdrawalReverse(new TransactionModel(request.Amount, request.AccountId, "Withdrawal Reverse"));
+                response = false;
+            }
+        });
                 
         return response;
     }
